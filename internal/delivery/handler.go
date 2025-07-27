@@ -2,7 +2,6 @@ package delivery
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"targeting-engine/internal/campaign"
 	"targeting-engine/internal/db"
@@ -18,7 +17,6 @@ func DeliveryHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	matched := getMatchingCampaigns(app, country, os)
-	fmt.Println("Length: ", len(matched))
 	if len(matched) == 0 {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusNoContent)
@@ -54,17 +52,14 @@ func getMatchingCampaigns(app, country, os string) []models.Campaign {
 
 	for _, c := range db.Campaigns {
 		if c.Status != "ACTIVE" {
-			fmt.Println("Reached Inactive state")
 			continue
 		}
-		fmt.Println("Reached")
 		for _, rule := range db.Rules {
 			if rule.CampaignID == c.ID && campaign.MatchRule(rule, app, country, os) {
 				matched = append(matched, c)
 				break
 			}
 		}
-		fmt.Println("Reached en of for loop")
 	}
 
 	return matched
